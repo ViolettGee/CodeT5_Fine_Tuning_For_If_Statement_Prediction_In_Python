@@ -6,10 +6,16 @@
 #output: columns: flattend/masked method, target_block, tokens_in_method
 
 #import necessary libraries
+import pandas as pd
+#need to import tokenizer
 
 #function for masking the target if statement in a method
+def target_masking(code_block, target):
+    return #placeholder
 
 #function for tokenizing the current method
+def tokenize_method(code_block):
+    return #placeholder
 
 #main section of code iterating through the files
 
