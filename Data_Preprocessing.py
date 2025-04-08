@@ -9,21 +9,55 @@
 import pandas as pd
 from pygments import lex
 from pygments.lexers import PythonLexer
+from transformers import RobertaTokenizer
+from alive_progress import alive_bar
 
 #function for masking the target if statement in a method
 def target_masking(code_block, target):
-    print(target)
     masked_code = code_block.replace(target, "<MASK>")
-    print(masked_code)
     return masked_code
 
 #function for tokenizing the current method
-def tokenize_method(code_block):
+def flatten_method(code_block):
     #tokenize data
     tokens = lex(code_block.strip(), PythonLexer())
-    return list(tokens)
+
+    #initalize method container
+    cleaned_method = []
+    #flatten the tokenized data
+    for token in list(tokens):
+        if not(str(token[0]) == "Token.Text.Whitespace") and not(token[1].strip() == ""):
+            cleaned_method.append(token[1].strip())
+    cleaned_method = " ".join(cleaned_method)
+    
+    return cleaned_method
+
+#function for tokenizing and embedding code
+def tokenize_method(code_block, tokenizer):
+    #tokenize data
+    tokens = tokenizer.tokenize(code_block)
+
+    #locate the masking in the tokens
+    index = [i for i, v in enumerate(tokens) if v == "MASK"][0]
+    tokens.pop(index+1)
+    tokens.pop(index-1)
+    tokens[index-1] = "<MASK>"
+
+    #encode tokens
+    embedding = tokenizer.encode(tokens)
+    return tokens, embedding
+
+#add the row to the relevant data frame
+def add_row(df, row):
+    df.loc[-1] = row
+    df.index = df.index + 1
+    df = df.sort_index()
+    return df
 
 #main section of code iterating through the files
+
+#initialize pre-trained tokenizer and embedding
+tokenizer = RobertaTokenizer.from_pretrained('Salesforce/codet5-base')
 
 #initialize each data frame
 training = pd.read_csv("Archive/ft_train.csv", encoding = "utf-8", dtype = "str")
@@ -33,42 +67,46 @@ validating = pd.read_csv("Archive/ft_valid.csv", encoding = "utf-8", dtype = "st
 archive = [training, testing, validating]
 
 #initialize output data frames
-training_out = pd.DataFrame(columns = ["flattened/masked method", "target_block", "tokens_in_method"])
-testing_out = pd.DataFrame(columns = ["flattened/masked method", "target_block", "tokens_in_method"])
-validating_out = pd.DataFrame(columns = ["flattened/masked method", "target_block", "tokens_in_method"])
+training_out = pd.DataFrame(columns = ["flattened/masked method", "target_block", "tokens_in_method", "embeded_tokens_in_method"])
+testing_out = pd.DataFrame(columns = ["flattened/masked method", "target_block", "tokens_in_method", "embeded_tokens_in_method"])
+validating_out = pd.DataFrame(columns = ["flattened/masked method", "target_block", "tokens_in_method", "embeded_tokens_in_method"])
 #initialize output file iterator object
 updated = [training_out, testing_out, validating_out]
 
-#iterate through each data frame
-for frame in range(len(archive)):
-    
-    #iterate through each row
-    for index, row in archive[frame].iterrows():
-
-        #call the function for tokenizing the data
-        tokenized_code = tokenize_method(row["cleaned_method"])
-        #save tokens
-        print(tokenized_code)
-        row["tokens_in_method"] = tokenized_code
-
-        #initalize method container
-        cleaned_method = []
-        #flatten the tokenized data
-        for token in tokenized_code:
-            if not(str(token[0]) == "Token.Text.Whitespace") and not(token[1].strip() == ""):
-                cleaned_method.append(token[1].strip())
-        cleaned_method = " ".join(cleaned_method)
+#create progress bar
+with alive_bar(training.shape[0]+testing.shape[0]+validating.shape[0]) as bar:
+    #iterate through each data frame
+    for frame in range(len(archive)):
         
-        #call the function for masking on current row
-        masked_method = target_masking(cleaned_method, row["target_block"])
-            
-        #update the tokens to correspond to the data
-        row["cleaned_method"] = masked_method
+        #iterate through each row
+        for index, row in archive[frame].iterrows():
     
-        #update the row of the data frame
-        updated[frame].loc[-1] = row
-        updated[frame].index = updated[frame].index + 1
-        updated[frame].index = updated[frame].sort_index()
+            #call the function for tokenizing the data
+            flattened_code = flatten_method(row["cleaned_method"])
+            
+            #call the function for masking on current row
+            masked_method = target_masking(flattened_code, row["target_block"])
+
+            #call the function for tokenizing the code
+            tokens, embedding = tokenize_method(masked_method, tokenizer)
+                
+            #update the tokens to correspond to the data
+            new_row = [masked_method, row["target_block"], tokens, embedding]
+            
+            #update training data
+            if frame == 0:
+                training_out = add_row(training_out, new_row)
+                
+            #update test data
+            elif frame == 1:
+                testing_out = add_row(testing_out, new_row)
+    
+            #update validation data
+            else:
+                validating_out = add_row(validating_out, new_row)
+
+            #increment progress bar
+            bar()
 
 #write each data frame to a new csv
 training_out.to_csv("Processed_Data/training.csv")
