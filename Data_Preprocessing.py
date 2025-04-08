@@ -38,7 +38,9 @@ def tokenize_method(code_block, tokenizer):
     tokens = tokenizer.tokenize(code_block)
 
     #locate the masking in the tokens
-    index = [i for i, v in enumerate(tokens) if v == "MASK"][0]
+    index = tokens.index("MASK")
+
+    #change the tokenized mask to be a token "<MASK>"
     tokens.pop(index+1)
     tokens.pop(index-1)
     tokens[index-1] = "<MASK>"
@@ -83,9 +85,10 @@ with alive_bar(training.shape[0]+testing.shape[0]+validating.shape[0]) as bar:
     
             #call the function for tokenizing the data
             flattened_code = flatten_method(row["cleaned_method"])
+            flattened_target = flatten_method(row["target_block"])
             
             #call the function for masking on current row
-            masked_method = target_masking(flattened_code, row["target_block"])
+            masked_method = target_masking(flattened_code, flattened_target)
 
             #call the function for tokenizing the code
             tokens, embedding = tokenize_method(masked_method, tokenizer)
