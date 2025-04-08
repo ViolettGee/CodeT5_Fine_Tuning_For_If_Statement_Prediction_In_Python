@@ -9,7 +9,6 @@
 import pandas as pd
 from pygments import lex
 from pygments.lexers import PythonLexer
-from transformers import RobertaTokenizer
 from alive_progress import alive_bar
 
 #function for masking the target if statement in a method
@@ -32,23 +31,6 @@ def flatten_method(code_block):
     
     return cleaned_method
 
-#function for tokenizing and embedding code
-def tokenize_method(code_block, tokenizer):
-    #tokenize data
-    tokens = tokenizer.tokenize(code_block)
-
-    #locate the masking in the tokens
-    index = tokens.index("MASK")
-
-    #change the tokenized mask to be a token "<MASK>"
-    tokens.pop(index+1)
-    tokens.pop(index-1)
-    tokens[index-1] = "<MASK>"
-
-    #encode tokens
-    embedding = tokenizer.encode(tokens)
-    return tokens, embedding
-
 #add the row to the relevant data frame
 def add_row(df, row):
     df.loc[-1] = row
@@ -57,9 +39,6 @@ def add_row(df, row):
     return df
 
 #main section of code iterating through the files
-
-#initialize pre-trained tokenizer and embedding
-tokenizer = RobertaTokenizer.from_pretrained('Salesforce/codet5-base')
 
 #initialize each data frame
 training = pd.read_csv("Archive/ft_train.csv", encoding = "utf-8", dtype = "str")
