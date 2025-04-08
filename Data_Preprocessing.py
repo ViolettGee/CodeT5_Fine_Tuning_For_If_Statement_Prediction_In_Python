@@ -3,7 +3,7 @@
 # - flatten each function
 
 #input: columns: cleaned_method, target_block, tokens_in_method
-#output: columns: flattend/masked method, target_block, tokens_in_method
+#output: columns: flattend/masked method, target_block
 
 #import necessary libraries
 import pandas as pd
@@ -69,11 +69,9 @@ validating = pd.read_csv("Archive/ft_valid.csv", encoding = "utf-8", dtype = "st
 archive = [training, testing, validating]
 
 #initialize output data frames
-training_out = pd.DataFrame(columns = ["flattened/masked method", "target_block", "tokens_in_method", "embeded_tokens_in_method"])
-testing_out = pd.DataFrame(columns = ["flattened/masked method", "target_block", "tokens_in_method", "embeded_tokens_in_method"])
-validating_out = pd.DataFrame(columns = ["flattened/masked method", "target_block", "tokens_in_method", "embeded_tokens_in_method"])
-#initialize output file iterator object
-updated = [training_out, testing_out, validating_out]
+training_out = pd.DataFrame(columns = ["flattened/masked method", "target_block")
+testing_out = pd.DataFrame(columns = ["flattened/masked method", "target_block")
+validating_out = pd.DataFrame(columns = ["flattened/masked method", "target_block")
 
 #create progress bar
 with alive_bar(training.shape[0]+testing.shape[0]+validating.shape[0]) as bar:
@@ -89,12 +87,9 @@ with alive_bar(training.shape[0]+testing.shape[0]+validating.shape[0]) as bar:
             
             #call the function for masking on current row
             masked_method = target_masking(flattened_code, flattened_target)
-
-            #call the function for tokenizing the code
-            tokens, embedding = tokenize_method(masked_method, tokenizer)
                 
             #update the tokens to correspond to the data
-            new_row = [masked_method, row["target_block"], tokens, embedding]
+            new_row = [masked_method, flattened_target)
             
             #update training data
             if frame == 0:
