@@ -7,14 +7,17 @@ from transformers import RobertaTokenizer
 from transformers import T5ForConditionalGeneration
 from transformers import DataCollatorWithPadding
 from transformers import EarlyStoppingCallback
+from transformers import Trainer
 import pandas as pd
 
 #initialize training parameters
 training_args = TrainingArguments(output_dir = "Model", 
                                   eval_strategy = "epoch", 
                                   learning_rate = 0.05, 
-                                  load_best_model = True)
+                                  save_strategy = "epoch",
+                                  load_best_model_at_end = True)
 #output_dir is the directory where model predictions and checkpoints will be written
+
 #eval_strategy is the type of evaluation strategy to adopt during training
 # - epoch because I am not implementing logs
 #learning_rate is the initial learning fro the optimizer
@@ -36,8 +39,8 @@ callbacks = EarlyStoppingCallback()
 #used early stopping due to it being asked for within the project specifications
 
 #initialize tokenized training and validation data
-training_data = pd.read_csv(columns = ['tokenized_method', 'tokenized_target'])
-validation_data = pd.read_csv(columns = ['tokenized_method', 'tokenized_target'])
+training_data = pd.read_csv("Tokenized_Data/training.csv", usecols = ['tokenized_method', 'tokenized_target'])
+validation_data = pd.read_csv("Tokenized_Data/validating.csv", usecols = ['tokenized_method', 'tokenized_target'])
 
 #initialize trainer object
 trainer = Trainer(model,
