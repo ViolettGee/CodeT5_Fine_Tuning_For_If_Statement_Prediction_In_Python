@@ -5,20 +5,32 @@
 from transformers import TrainingArguments
 from transformers import RobertaTokenizer
 from transformers import T5ForConditionalGeneration
-from transformers import DataCollatorWithPadding
+from transformers import DataCollatorForSeq2Seq
 from transformers import EarlyStoppingCallback
 from transformers import Trainer
 from datasets import load_dataset
+
+#tokenize the dataset
+def tokenize_data(examples):
+    
+    #tokenize the models inputs
+    model_inputs = tokenizer(examples['flattened/masked method'], padding = "max_length", truncation = True)
+    
+    #tokenize the models target outputs
+    labels = tokenizer(examples['target_block'], padding = "max_length", truncation = True)
+    
+    #concatenate the inputs and outputs
+    model_inputs["labels"] = labels["input_ids"]
+    
+    return model_inputs
 
 #initialize training parameters
 training_args = TrainingArguments(output_dir = "Model", 
                                   eval_strategy = "epoch", 
                                   learning_rate = 0.05, 
                                   save_strategy = "epoch",
-                                  load_best_model_at_end = True,
-                                  remove_unused_columns = False)
+                                  load_best_model_at_end = True)
 #output_dir is the directory where model predictions and checkpoints will be written
-
 #eval_strategy is the type of evaluation strategy to adopt during training
 # - epoch because I am not implementing logs
 #learning_rate is the initial learning fro the optimizer
@@ -32,23 +44,31 @@ tokenizer = RobertaTokenizer.from_pretrained('Salesforce/codet5-small')
 #initialize pretrained model
 model = T5ForConditionalGeneration.from_pretrained('Salesforce/codet5-small')
 
-#initialize data collator used padding due to others being built to include labels
-data_collator = DataCollatorWithPadding(tokenizer = tokenizer)
+#initialize data collator and this is the one optimized to include labels
+data_collator = DataCollatorForSeq2Seq(tokenizer = tokenizer, model = model)
 
 #initalize callback object
 callbacks = EarlyStoppingCallback()
 #used early stopping due to it being asked for within the project specifications
 
-#initialize tokenized training and validation data
-training_data = load_dataset("csv", data_files = "Tokenized_Data/training.csv")
-print(training_data['train'])
-validation_data = load_dataset("csv", data_files = "Tokenized_Data/validating.csv")
+#initilize validation data
+training_data = load_dataset('csv', 
+                             data_files = 'Processed_Data/training.csv')
+validation_data = load_dataset('csv',
+                               data_files = 'Processed_Data/validating.csv')
+
+#tokenize the data
+training_dataset = training_data['train'].map(tokenize_data, batched = True)
+validation_dataset = validation_data['train'].map(tokenize_data, batched = True)
+
+#convert the datasets to PyTorch tensors
+training_dataset.set_format('torch')
+validation_dataset.set_format('torch')
 
 #initialize trainer object
-trainer = Trainer(model,
-                  training_args,
-                  train_dataset = training_data['train'],
-                  eval_dataset = validation_data,
+trainer = Trainer(model, training_args, 
+                  train_dataset = training_dataset, 
+                  eval_dataset = validation_dataset,
                   data_collator = data_collator,
                   tokenizer = tokenizer,
                   callbacks = [callbacks])
