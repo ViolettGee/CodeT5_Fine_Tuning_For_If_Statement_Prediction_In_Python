@@ -35,7 +35,7 @@ model = T5ForConditionalGeneration.from_pretrained('Salesforce/codet5-small')
 data_collator = DataCollatorWithPadding(tokenizer = tokenizer)
 
 #initalize callback object
-callbacks = EarlyStoppingCallback()
+callback = EarlyStoppingCallback()
 #used early stopping due to it being asked for within the project specifications
 
 #initialize tokenized training and validation data
@@ -49,7 +49,7 @@ trainer = Trainer(model,
                   eval_dataset = validation_data,
                   data_collator = data_collator,
                   tokenizer = tokenizer,
-                  callbacks = callbacks)
+                  callbacks = [callback])
 #model is the model that is being trained, evaluated and used for productions
 #args is the training arguments that are initialized above
 #data_collator is the collator object initialized above
