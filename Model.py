@@ -8,14 +8,15 @@ from transformers import T5ForConditionalGeneration
 from transformers import DataCollatorWithPadding
 from transformers import EarlyStoppingCallback
 from transformers import Trainer
-import pandas as pd
+from datasets import load_dataset
 
 #initialize training parameters
 training_args = TrainingArguments(output_dir = "Model", 
                                   eval_strategy = "epoch", 
                                   learning_rate = 0.05, 
                                   save_strategy = "epoch",
-                                  load_best_model_at_end = True)
+                                  load_best_model_at_end = True,
+                                  remove_unused_columns = False)
 #output_dir is the directory where model predictions and checkpoints will be written
 
 #eval_strategy is the type of evaluation strategy to adopt during training
@@ -35,21 +36,22 @@ model = T5ForConditionalGeneration.from_pretrained('Salesforce/codet5-small')
 data_collator = DataCollatorWithPadding(tokenizer = tokenizer)
 
 #initalize callback object
-callback = EarlyStoppingCallback()
+callbacks = EarlyStoppingCallback()
 #used early stopping due to it being asked for within the project specifications
 
 #initialize tokenized training and validation data
-training_data = pd.read_csv("Tokenized_Data/training.csv", usecols = ['tokenized_method', 'tokenized_target'])
-validation_data = pd.read_csv("Tokenized_Data/validating.csv", usecols = ['tokenized_method', 'tokenized_target'])
+training_data = load_dataset("csv", data_files = "Tokenized_Data/training.csv")
+print(training_data['train'])
+validation_data = load_dataset("csv", data_files = "Tokenized_Data/validating.csv")
 
 #initialize trainer object
 trainer = Trainer(model,
                   training_args,
-                  train_dataset = training_data,
+                  train_dataset = training_data['train'],
                   eval_dataset = validation_data,
                   data_collator = data_collator,
                   tokenizer = tokenizer,
-                  callbacks = [callback])
+                  callbacks = [callbacks])
 #model is the model that is being trained, evaluated and used for productions
 #args is the training arguments that are initialized above
 #data_collator is the collator object initialized above

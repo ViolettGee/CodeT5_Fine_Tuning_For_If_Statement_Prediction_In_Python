@@ -12,9 +12,7 @@ from alive_progress import alive_bar
 def tokenize_code(code, tokenizer):
     #tokenize data
     tokens = tokenizer.tokenize(code)
-    #encode tokens
-    embedding = tokenizer.encode(tokens)
-    return tokens, embedding
+    return tokens
 
 #function creating a row in the data frame
 def add_row(df, row):
@@ -33,9 +31,9 @@ validating = pd.read_csv("Processed_Data/validating.csv")
 processed_data = [training, testing, validating]
 
 #initialize output dataframes for data set
-training_out = pd.DataFrame(columns=["tokenized_method","embeded_method","tokenized_target","embedded_target"])
-testing_out = pd.DataFrame(columns=["tokenized_method","embeded_method","tokenized_target","embedded_target"])
-validating_out = pd.DataFrame(columns=["tokenized_method","embeded_method","tokenized_target","embedded_target"])
+training_out = pd.DataFrame(columns=["tokenized_method","tokenized_target"])
+testing_out = pd.DataFrame(columns=["tokenized_method","tokenized_target"])
+validating_out = pd.DataFrame(columns=["tokenized_method","tokenized_target"])
 
 #initialize pre-trained tokenizer and embedding
 tokenizer = RobertaTokenizer.from_pretrained('Salesforce/codet5-base')
@@ -48,13 +46,13 @@ with alive_bar(training.shape[0]+testing.shape[0]+validating.shape[0]) as bar:
         for index, row in processed_data[frame].iterrows():
             
             #tokenize the method data
-            tokenized_method, embedded_method = tokenize_code(row["flattened/masked method"], tokenizer)
+            tokenized_method = tokenize_code(row["flattened/masked method"], tokenizer)
 
             #tokenize the target data
-            tokenized_target, embedded_target = tokenize_code(row["target_block"], tokenizer)
+            tokenized_target = tokenize_code(row["target_block"], tokenizer)
 
             #initialize output row 
-            new_row = [tokenized_method, embedded_method, tokenized_target, embedded_target]
+            new_row = [tokenized_method, tokenized_target]
 
             #update training data
             if frame == 0:
