@@ -26,9 +26,9 @@ def add_row(df, row):
 #main section of code iterating through data
 
 #initialize dataframes for data set
-training = pd.read_csv("Processed_Data\training.csv")
-testing = pd.read_csv("Processed_Data\testing.csv")
-validating = pd.read_csv("Processed_Data\validating.csv")
+training = pd.read_csv("Processed_Data/training.csv")
+testing = pd.read_csv("Processed_Data/testing.csv")
+validating = pd.read_csv("Processed_Data/validating.csv")
 #initialize file input iterator object
 processed_data = [training, testing, validating]
 
@@ -48,7 +48,7 @@ with alive_bar(training.shape[0]+testing.shape[0]+validating.shape[0]) as bar:
         for index, row in processed_data[frame].iterrows():
             
             #tokenize the method data
-            tokenized_method, embedded_method = tokenize_code(row["flattend/masked method"], tokenizer)
+            tokenized_method, embedded_method = tokenize_code(row["flattened/masked method"], tokenizer)
 
             #tokenize the target data
             tokenized_target, embedded_target = tokenize_code(row["target_block"], tokenizer)

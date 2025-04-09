@@ -48,9 +48,9 @@ validating = pd.read_csv("Archive/ft_valid.csv", encoding = "utf-8", dtype = "st
 archive = [training, testing, validating]
 
 #initialize output data frames
-training_out = pd.DataFrame(columns = ["flattened/masked method", "target_block")
-testing_out = pd.DataFrame(columns = ["flattened/masked method", "target_block")
-validating_out = pd.DataFrame(columns = ["flattened/masked method", "target_block")
+training_out = pd.DataFrame(columns = ["flattened/masked method", "target_block"])
+testing_out = pd.DataFrame(columns = ["flattened/masked method", "target_block"])
+validating_out = pd.DataFrame(columns = ["flattened/masked method", "target_block"])
 
 #create progress bar
 with alive_bar(training.shape[0]+testing.shape[0]+validating.shape[0]) as bar:
@@ -68,7 +68,7 @@ with alive_bar(training.shape[0]+testing.shape[0]+validating.shape[0]) as bar:
             masked_method = target_masking(flattened_code, flattened_target)
                 
             #update the tokens to correspond to the data
-            new_row = [masked_method, flattened_target)
+            new_row = [masked_method, flattened_target]
             
             #update training data
             if frame == 0:
