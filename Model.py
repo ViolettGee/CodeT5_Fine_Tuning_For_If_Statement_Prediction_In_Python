@@ -53,9 +53,9 @@ callbacks = EarlyStoppingCallback()
 
 #initilize validation data
 training_data = load_dataset('csv', 
-                             data_files = 'Processed_Data/training.csv')
+                             data_files = 'Tokenized_Data/training.csv')
 validation_data = load_dataset('csv',
-                               data_files = 'Processed_Data/validating.csv')
+                               data_files = 'Tokenized_Data/validating.csv')
 
 #tokenize the data
 training_dataset = training_data['train'].map(tokenize_data, batched = True)
