@@ -7,4 +7,7 @@ Pandas version 2.2.3
 Numpy version 2.2.4
 Pygments version 2.19.1
 Alive_progress version 3.2.0
-Transformers version 4.51.0
+Transformers version 4.51.2
+Transformers[torch] version 0.30.0
+
+model_location = https://drive.google.com/drive/folders/1JKY4j0MBOo3W3kARly0pd6Z7127IOtyw?usp=sharing
