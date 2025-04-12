@@ -1,17 +1,23 @@
-#purpose of the file is to compute the F1 score and perplexity
+#purpose of the file is to compute averages of inidividual measures and F1 score and perplexity
 
-#function for computing precision
-def precision():
-    return #placeholder
+#inputs: "input_method", "exact_match", "expected_if_condition", "predicted_if_condition", "CodeBLEU_score", "BLEU-4_score"
+#outputs: average CodeBLEU, average BLEU-4, precision, recall, F1 score
 
-#function for computing recall
-def recall():
-    return #placeholder
+#function for computing F1 score
 
-#function for computing F1
-def F1_score():
-    return #placeholder
+#count the number of true positives
 
-#function for computing perplexity
-def perplexity():
-    return #placeholder
+#count the number of false positives
+
+#count the number of true negatives
+
+#count the number of false negatives
+
+#function call for F1 score
+
+#output average CodeBLEU
+#output average BLEU-4
+#output precision
+#output recall
+#output F1 score
+
