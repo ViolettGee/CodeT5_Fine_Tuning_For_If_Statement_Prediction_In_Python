@@ -14,4 +14,4 @@ evaluate version 0.4.3
 codebleu version 0.7.0
 tree-sitter-python version 0.23.6
 
-model_location = https://drive.google.com/drive/folders/1JKY4j0MBOo3W3kARly0pd6Z7127IOtyw?usp=sharing
+model_location = https://drive.google.com/drive/folders/1HJ04K5MgQ4qAzWtYtUGTCOzTaBLHDUp7?usp=sharing
