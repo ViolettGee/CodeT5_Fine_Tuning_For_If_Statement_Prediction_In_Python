@@ -65,7 +65,7 @@ def add_row(df, row):
 #import tokenizer object
 tokenizer = RobertaTokenizer.from_pretrained("Salesforce/codet5-small")
 #import fine tuned model
-model = T5ForConditionalGeneration.from_pretrained("Model/checkpoint-18750")
+model = T5ForConditionalGeneration.from_pretrained("Model")
 
 #import testing data file
 testing = pd.read_csv("Tokenized_Data/testing.csv")
@@ -99,3 +99,6 @@ with alive_bar(testing.shape[0]) as bar:
 
         #increment progress bar
         bar()
+
+#export output
+output.to_csv("output.csv")

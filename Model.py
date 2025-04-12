@@ -14,10 +14,10 @@ from datasets import load_dataset
 def tokenize_data(examples):
     
     #tokenize the models inputs
-    model_inputs = tokenizer(examples['tokenized_method'], padding = "max_length", truncation = True)
+    model_inputs = tokenizer(examples['flattened/masked method'], padding = "max_length", truncation = True)
     
     #tokenize the models target outputs
-    labels = tokenizer(examples['tokenized_target'], padding = "max_length", truncation = True)
+    labels = tokenizer(examples['target_block'], padding = "max_length", truncation = True)
     
     #concatenate the inputs and outputs
     model_inputs["labels"] = labels["input_ids"]
@@ -27,7 +27,7 @@ def tokenize_data(examples):
 #initialize training parameters
 training_args = TrainingArguments(output_dir = "Model", 
                                   eval_strategy = "epoch", 
-                                  learning_rate = 0.05, 
+                                  learning_rate = 0.0005, 
                                   save_strategy = "epoch",
                                   load_best_model_at_end = True)
 #output_dir is the directory where model predictions and checkpoints will be written
