@@ -65,7 +65,7 @@ def add_row(df, row):
 #import tokenizer object
 tokenizer = RobertaTokenizer.from_pretrained("Salesforce/codet5-small")
 #import fine tuned model
-model = T5ForConditionalGeneration.from_pretrained("Model")
+model = T5ForConditionalGeneration.from_pretrained("Model/checkpoint-18750")
 
 #import testing data file
 testing = pd.read_csv("Tokenized_Data/testing.csv")
