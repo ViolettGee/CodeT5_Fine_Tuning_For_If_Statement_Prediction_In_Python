@@ -14,10 +14,10 @@ from datasets import load_dataset
 def tokenize_data(examples):
     
     #tokenize the models inputs
-    model_inputs = tokenizer(examples['flattened/masked method'], padding = "max_length", truncation = True)
+    model_inputs = tokenizer(examples['tokenized_method'], padding = "max_length", truncation = True)
     
     #tokenize the models target outputs
-    labels = tokenizer(examples['target_block'], padding = "max_length", truncation = True)
+    labels = tokenizer(examples['tokenized_target'], padding = "max_length", truncation = True)
     
     #concatenate the inputs and outputs
     model_inputs["labels"] = labels["input_ids"]
